@@ -112,8 +112,8 @@ def on_result(result, output_image: mp.Image, timestamp_ms: int):
         # Get the current expression states
         eyeBlinkLeft = next((b.score for b in result.face_blendshapes if b.category_name == "eyeBlinkLeft"), 0)
         eyeBlinkRight = next((b.score for b in result.face_blendshapes if b.category_name == "eyeBlinkRight"), 0)
-        blinking = eyeBlinkLeft > 0.5 or eyeBlinkRight > 0.5
-        scared = next((b.score for b in result.face_blendshapes if b.category_name == "jawOpen"), 0) > 0.5
+        blinking = eyeBlinkLeft > BLINKING_THRESHOLD or eyeBlinkRight > BLINKING_THRESHOLD
+        scared = next((b.score for b in result.face_blendshapes if b.category_name == "jawOpen"), 0) > SCARED_THRESHOLD
         speaking = is_speaking()
 
         if SHOW_LANDMARKED_VIDEO_FEED:
@@ -159,7 +159,7 @@ def cleanup():
     p.terminate()
 
 # Main loop which captures the video and updates the virtual camera
-with pyvirtualcam.Camera(width=CAM_WIDTH, height=CAM_HEIGHT, fps=30) as cam:
+with pyvirtualcam.Camera(width=CAM_WIDTH, height=CAM_HEIGHT, fps=FPS) as cam:
     with HolisticLandmarker.create_from_options(options) as landmarker:
         print("Use \"Ctr+C\" to close.")
         sprite = sprites[(False, False, False)]
